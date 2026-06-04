@@ -64,16 +64,8 @@ pub fn handler(ctx: Context<Deposit>, lamports_to_transfer: u64) -> Result<()> {
         to: ctx.accounts.vault.to_account_info(),
     };
 
-    let owener_key = ctx.accounts.owner.key();
-    let seeds: &[&[u8]] = &[
-        VAULT_SEED,
-        owener_key.as_ref(),
-        &[ctx.accounts.vault_authority.vault_bump],
-    ];
-    let signer_seeds = &[seeds];
-
-    let cpi_contex = CpiContext::new_with_signer(system_program::id(), cpi_accounts, signer_seeds);
-    transfer(cpi_contex, lamports_to_transfer)?;
+    let cpi_context = CpiContext::new(system_program::id(), cpi_accounts);
+    transfer(cpi_context, lamports_to_transfer)?;
 
     ctx.accounts.vault_authority.current_deposited_lamports = new_deposited_lamports;
     Ok(())
