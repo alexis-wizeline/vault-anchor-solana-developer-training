@@ -56,7 +56,6 @@ pub fn deposit_handler(ctx: Context<Initialize>) -> Result<()> {
 
     ctx.accounts.vault_authority.set_inner(VaultState {
         owner: ctx.accounts.owner.key(),
-        current_deposited_lamports: current_rent_lamports,
         vault_bump: ctx.bumps.vault,
         bump: ctx.bumps.vault_authority,
     });

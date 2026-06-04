@@ -37,10 +37,9 @@ pub struct Deposit<'info> {
 }
 
 pub fn handler(ctx: Context<Deposit>, lamports_to_transfer: u64) -> Result<()> {
-    let new_deposited_lamports = ctx
-        .accounts
-        .vault_authority
-        .current_deposited_lamports
+    ctx.accounts
+        .vault
+        .lamports()
         .checked_add(lamports_to_transfer)
         .ok_or(InvalidTransferOverflow)?;
 
@@ -67,6 +66,5 @@ pub fn handler(ctx: Context<Deposit>, lamports_to_transfer: u64) -> Result<()> {
     let cpi_context = CpiContext::new(system_program::id(), cpi_accounts);
     transfer(cpi_context, lamports_to_transfer)?;
 
-    ctx.accounts.vault_authority.current_deposited_lamports = new_deposited_lamports;
     Ok(())
 }

@@ -8,4 +8,8 @@ pub enum ErrorCode {
     InvalidTransferNotRentExcept,
     #[msg("Not enough blanace to transfer to the vault")]
     InsufficientFunds,
+    #[msg("the amoun to withdraw should be more than 0")]
+    InvalidWithdrawAmount,
+    #[msg("the vault does not have enough funds to withdraw")]
+    InsufficientFundsVault,
 }

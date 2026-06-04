@@ -22,4 +22,8 @@ pub mod vault {
     pub fn deposit(ctx: Context<Deposit>, lamports_to_transfer: u64) -> Result<()> {
         deposit::handler(ctx, lamports_to_transfer)
     }
+
+    pub fn withdraw(ctx: Context<Withdraw>, amount_to_withdraw: u64) -> Result<()> {
+        withdraw::withdraw_handler(ctx, amount_to_withdraw)
+    }
 }
