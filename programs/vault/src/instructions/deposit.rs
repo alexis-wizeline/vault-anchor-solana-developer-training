@@ -36,7 +36,7 @@ pub struct Deposit<'info> {
     pub system_porgram: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<Deposit>, lamports_to_transfer: u64) -> Result<()> {
+pub fn deposit_handler(ctx: Context<Deposit>, lamports_to_transfer: u64) -> Result<()> {
     ctx.accounts
         .vault
         .lamports()

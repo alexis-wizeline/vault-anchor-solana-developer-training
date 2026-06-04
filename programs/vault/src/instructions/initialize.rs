@@ -35,7 +35,7 @@ pub struct Initialize<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn deposit_handler(ctx: Context<Initialize>) -> Result<()> {
+pub fn initialize_handler(ctx: Context<Initialize>) -> Result<()> {
     let rent = Rent::get()?;
     let current_rent_lamports = rent.minimum_balance(0);
 
