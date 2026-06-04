@@ -12,4 +12,6 @@ pub enum ErrorCode {
     InvalidWithdrawAmount,
     #[msg("the vault does not have enough funds to withdraw")]
     InsufficientFundsVault,
+    #[msg("the amount to withdraw exceed the max amount allowed in the authority")]
+    InvalidMaxWithdrawExcceded,
 }

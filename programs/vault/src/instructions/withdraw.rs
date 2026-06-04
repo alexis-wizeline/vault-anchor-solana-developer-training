@@ -39,6 +39,16 @@ pub fn withdraw_handler(ctx: Context<Withdraw>, amount_to_withdraw: u64) -> Resu
         crate::error::ErrorCode::InvalidWithdrawAmount
     );
 
+    match ctx.accounts.vault_authority.max_withdraw {
+        Some(amount) => {
+            require!(
+                amount >= amount_to_withdraw,
+                crate::error::ErrorCode::InvalidMaxWithdrawExcceded
+            );
+        }
+        None => {}
+    }
+
     ctx.accounts
         .vault
         .lamports()

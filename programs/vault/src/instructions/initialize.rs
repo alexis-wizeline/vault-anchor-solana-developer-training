@@ -35,7 +35,7 @@ pub struct Initialize<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn initialize_handler(ctx: Context<Initialize>) -> Result<()> {
+pub fn initialize_handler(ctx: Context<Initialize>, max_withdraw: Option<u64>) -> Result<()> {
     let rent = Rent::get()?;
     let current_rent_lamports = rent.minimum_balance(0);
 
@@ -56,6 +56,7 @@ pub fn initialize_handler(ctx: Context<Initialize>) -> Result<()> {
 
     ctx.accounts.vault_authority.set_inner(VaultState {
         owner: ctx.accounts.owner.key(),
+        max_withdraw: max_withdraw,
         vault_bump: ctx.bumps.vault,
         bump: ctx.bumps.vault_authority,
     });

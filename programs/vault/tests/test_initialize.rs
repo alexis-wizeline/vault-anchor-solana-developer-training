@@ -31,7 +31,7 @@ fn test_initialize() {
 
     let instruction = Instruction::new_with_bytes(
         program_id,
-        &vault::instruction::Initialize {}.data(),
+        &vault::instruction::Initialize { max_withdraw: None }.data(),
         vault::accounts::Initialize {
             owner: payer.pubkey(),
             vault: vault_pda,
