@@ -99,4 +99,49 @@ impl Transaction {
         let tx = VersionedTransaction::try_new(VersionedMessage::Legacy(msg), &[&payer]).unwrap();
         svm.send_transaction(tx)
     }
+
+    pub fn run_withdraw(
+        &self,
+        svm: &mut LiteSVM,
+        payer: &Keypair,
+        amount_to_withdraw: u64,
+    ) -> TransactionResult {
+        let instruction = Instruction::new_with_bytes(
+            self.program_id,
+            &vault::instruction::Withdraw { amount_to_withdraw }.data(),
+            vault::accounts::Withdraw {
+                owner: payer.pubkey(),
+                vault: self.vault_pda,
+                vault_authority: self.vault_state_pda,
+                system_porgram: system_program::ID,
+            }
+            .to_account_metas(None),
+        );
+        let blockhash = &svm.latest_blockhash();
+        let message =
+            Message::new_with_blockhash(&[instruction], Some(&payer.pubkey()), &blockhash);
+        let tx =
+            VersionedTransaction::try_new(VersionedMessage::Legacy(message), &[payer]).unwrap();
+        svm.send_transaction(tx)
+    }
+
+    pub fn run_close(&self, svm: &mut LiteSVM, payer: &Keypair) -> TransactionResult {
+        let instruction = Instruction::new_with_bytes(
+            self.program_id,
+            &vault::instruction::Close {}.data(),
+            vault::accounts::Close {
+                owner: payer.pubkey(),
+                vault_authority: self.vault_state_pda,
+                vault: self.vault_pda,
+                system_program: system_program::ID,
+            }
+            .to_account_metas(None),
+        );
+        let blockhash = &svm.latest_blockhash();
+        let message =
+            Message::new_with_blockhash(&[instruction], Some(&payer.pubkey()), &blockhash);
+        let tx =
+            VersionedTransaction::try_new(VersionedMessage::Legacy(message), &[payer]).unwrap();
+        svm.send_transaction(tx)
+    }
 }

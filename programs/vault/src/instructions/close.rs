@@ -30,7 +30,7 @@ pub struct Close<'info> {
     )]
     pub vault: SystemAccount<'info>,
 
-    pub system_progra: Program<'info, System>,
+    pub system_program: Program<'info, System>,
 }
 
 pub fn close_handler(ctx: Context<Close>) -> Result<()> {
