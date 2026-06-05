@@ -1,51 +1,27 @@
+mod utils;
+
 use {
-    anchor_lang::{
-        solana_program::{instruction::Instruction, rent::Rent},
-        system_program, AccountDeserialize, InstructionData, ToAccountMetas,
-    },
-    litesvm::LiteSVM,
-    solana_keypair::Keypair,
-    solana_message::{Message, VersionedMessage},
-    solana_pubkey::Pubkey,
+    anchor_lang::{solana_program::rent::Rent, AccountDeserialize},
     solana_signer::Signer,
-    solana_transaction::versioned::VersionedTransaction,
 };
 
 #[test]
 fn test_initialize() {
     let program_id = vault::id();
-    let payer = Keypair::new();
+    let (payer, mut svm) = utils::setup();
     let payer_address = payer.pubkey();
-    let mut svm = LiteSVM::new();
-    let bytes = include_bytes!("../../../target/deploy/vault.so");
-    svm.add_program(program_id, bytes).unwrap();
-    svm.airdrop(&payer.pubkey(), 20_000_000_000).unwrap();
 
-    let (vault_pda, vault_bump) =
-        Pubkey::find_program_address(&[vault::VAULT_SEED, payer.pubkey().as_ref()], &program_id);
+    let pdas = utils::derive_addresses(&payer_address);
+    let vault_pda = pdas.vault_address;
+    let vault_state_pda = pdas.vault_state_address;
 
-    let (vault_state_pda, state_bump) = Pubkey::find_program_address(
-        &[vault::VAULT_STATE_SEED, payer.pubkey().as_ref()],
-        &program_id,
-    );
-
-    let instruction = Instruction::new_with_bytes(
+    let tx = utils::Transaction {
         program_id,
-        &vault::instruction::Initialize { max_withdraw: None }.data(),
-        vault::accounts::Initialize {
-            owner: payer.pubkey(),
-            vault: vault_pda,
-            vault_authority: vault_state_pda,
-            system_program: system_program::ID,
-        }
-        .to_account_metas(None),
-    );
+        vault_pda,
+        vault_state_pda,
+    };
 
-    let blockhash = svm.latest_blockhash();
-    let msg = Message::new_with_blockhash(&[instruction], Some(&payer.pubkey()), &blockhash);
-    let tx = VersionedTransaction::try_new(VersionedMessage::Legacy(msg), &[payer]).unwrap();
-
-    let res = svm.send_transaction(tx);
+    let res = tx.run_intialize(&mut svm, &payer, None);
 
     assert!(res.is_ok());
 
@@ -61,15 +37,15 @@ fn test_initialize() {
         };
 
     assert_eq!(
-        vault_state.bump, state_bump,
+        vault_state.bump, pdas.vault_state_bump,
         "vault state bump assertion failed:  expect: {}, got: {}",
-        state_bump, vault_state.bump
+        pdas.vault_state_bump, vault_state.bump
     );
 
     assert_eq!(
-        vault_state.vault_bump, vault_bump,
+        vault_state.vault_bump, pdas.vault_bump,
         "vault bump assertion failed:  expect: {}, got: {}",
-        vault_bump, vault_state.vault_bump
+        pdas.vault_bump, vault_state.vault_bump
     );
 
     assert_eq!(
