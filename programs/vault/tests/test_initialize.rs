@@ -21,7 +21,7 @@ fn test_initialize() {
         vault_state_pda,
     };
 
-    let res = tx.run_intialize(&mut svm, &payer, None);
+    let res = tx.run_initialize(&mut svm, &payer, None);
 
     assert!(res.is_ok());
 

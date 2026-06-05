@@ -18,7 +18,7 @@ fn test_challenge() {
         vault_state_pda,
     };
 
-    let res = tx.run_intialize(&mut svm, &payer, Some(5_000_000_000));
+    let res = tx.run_initialize(&mut svm, &payer, Some(5_000_000_000));
     assert!(res.is_ok());
 
     let rent: Rent = svm.get_sysvar();

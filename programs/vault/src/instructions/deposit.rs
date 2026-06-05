@@ -33,7 +33,7 @@ pub struct Deposit<'info> {
     )]
     pub vault_authority: Account<'info, VaultState>,
 
-    pub system_porgram: Program<'info, System>,
+    pub system_program: Program<'info, System>,
 }
 
 pub fn deposit_handler(ctx: Context<Deposit>, lamports_to_transfer: u64) -> Result<()> {
@@ -55,7 +55,7 @@ pub fn deposit_handler(ctx: Context<Deposit>, lamports_to_transfer: u64) -> Resu
 
     require!(
         reminded_lamports >= neccesary_lamports,
-        crate::error::ErrorCode::InvalidTransferNotRentExcept
+        crate::error::ErrorCode::InvalidTransferNotRentExempt
     );
 
     let cpi_accounts = Transfer {

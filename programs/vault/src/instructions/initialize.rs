@@ -5,7 +5,7 @@ use anchor_lang::{
 
 use crate::{
     constants::{ANCHOR_DISCRIMINATOR_SIZE, VAULT_SEED, VAULT_STATE_SEED},
-    error::ErrorCode::InvalidTransferNotRentExcept,
+    error::ErrorCode::InvalidTransferNotRentExempt,
     VaultState,
 };
 
@@ -39,11 +39,17 @@ pub fn initialize_handler(ctx: Context<Initialize>, max_withdraw: Option<u64>) -
     let rent = Rent::get()?;
     let current_rent_lamports = rent.minimum_balance(0);
 
-    ctx.accounts
+    let owner_lamports_after = ctx
+        .accounts
         .owner
         .lamports()
         .checked_sub(current_rent_lamports)
-        .ok_or(InvalidTransferNotRentExcept)?;
+        .ok_or(InvalidTransferNotRentExempt)?;
+
+    require!(
+        owner_lamports_after >= current_rent_lamports,
+        crate::error::ErrorCode::InvalidTransferNotRentExempt
+    );
 
     let cpi_accounts = Transfer {
         from: ctx.accounts.owner.to_account_info(),
@@ -56,7 +62,7 @@ pub fn initialize_handler(ctx: Context<Initialize>, max_withdraw: Option<u64>) -
 
     ctx.accounts.vault_authority.set_inner(VaultState {
         owner: ctx.accounts.owner.key(),
-        max_withdraw: max_withdraw,
+        max_withdraw,
         vault_bump: ctx.bumps.vault,
         bump: ctx.bumps.vault_authority,
     });

@@ -30,7 +30,7 @@ pub struct Withdraw<'info> {
     )]
     pub vault: SystemAccount<'info>,
 
-    pub system_porgram: Program<'info, System>,
+    pub system_program: Program<'info, System>,
 }
 
 pub fn withdraw_handler(ctx: Context<Withdraw>, amount_to_withdraw: u64) -> Result<()> {
@@ -46,11 +46,19 @@ pub fn withdraw_handler(ctx: Context<Withdraw>, amount_to_withdraw: u64) -> Resu
         );
     }
 
-    ctx.accounts
+    let remind_lamports = ctx
+        .accounts
         .vault
         .lamports()
         .checked_sub(amount_to_withdraw)
         .ok_or(InsufficientFundsVault)?;
+
+    let rent = Rent::get()?;
+    let rent_exmept = rent.minimum_balance(0);
+    require!(
+        remind_lamports >= rent_exmept,
+        crate::error::ErrorCode::InvalidWithdrawDrainedVault
+    );
 
     let cpi_accounts = Transfer {
         from: ctx.accounts.vault.to_account_info(),

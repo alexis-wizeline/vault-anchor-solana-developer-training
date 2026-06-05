@@ -49,7 +49,7 @@ pub struct Transaction {
 
 #[allow(dead_code)]
 impl Transaction {
-    pub fn run_intialize(
+    pub fn run_initialize(
         &self,
         svm: &mut LiteSVM,
         payer: &Keypair,
@@ -89,7 +89,7 @@ impl Transaction {
                 owner: payer.pubkey(),
                 vault: self.vault_pda,
                 vault_authority: self.vault_state_pda,
-                system_porgram: system_program::ID,
+                system_program: system_program::ID,
             }
             .to_account_metas(None),
         );
@@ -113,7 +113,7 @@ impl Transaction {
                 owner: payer.pubkey(),
                 vault: self.vault_pda,
                 vault_authority: self.vault_state_pda,
-                system_porgram: system_program::ID,
+                system_program: system_program::ID,
             }
             .to_account_metas(None),
         );

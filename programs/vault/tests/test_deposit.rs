@@ -18,7 +18,7 @@ fn test_deposit() {
         vault_state_pda,
     };
 
-    let res = tx.run_intialize(&mut svm, &payer, None);
+    let res = tx.run_initialize(&mut svm, &payer, None);
     assert!(res.is_ok());
 
     let deposit_lamports = 5_000_000_000;
